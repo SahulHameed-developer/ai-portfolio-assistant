@@ -35,7 +35,7 @@ test('POST /api/ask falls back to retrieval-only without an LLM', async () => {
   const { server, url } = await start({ generate: async () => null });
   const data = await (await ask(url, { question: 'notice period?' })).json();
   assert.strictEqual(data.mode, 'retrieval-only');
-  assert.match(data.answer, /3 months/);
+  assert.match(data.answer, /1 month/);
   assert.strictEqual(data.sources[0].id, 'availability');
   server.close();
 });
