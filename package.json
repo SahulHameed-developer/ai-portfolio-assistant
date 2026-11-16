@@ -1,0 +1,15 @@
+{
+  "name": "ai-portfolio-assistant",
+  "version": "1.0.0",
+  "description": "Node.js + Express RAG assistant that answers recruiters' questions about A Mohamed Sahul Hameed.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=18" },
+  "author": "A Mohamed Sahul Hameed",
+  "license": "MIT",
+  "dependencies": { "express": "^4.21.2" }
+}

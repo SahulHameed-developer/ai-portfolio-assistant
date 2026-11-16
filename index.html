@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ask about Sahul — AI assistant</title>
+<style>
+  :root { --bg:#f7f8fc; --card:#fff; --text:#0f172a; --muted:#5b6478; --border:#e2e6f0; --primary:#2563eb; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0b1020; --card:#141b33; --text:#e6e9f2; --muted:#9aa3ba; --border:#232c4a; --primary:#60a5fa; } }
+  * { box-sizing: border-box; } body { margin:0; font:16px/1.6 system-ui, sans-serif; background:var(--bg); color:var(--text); }
+  main { max-width: 720px; margin: 40px auto; padding: 0 16px; }
+  h1 { margin: 0 0 4px; } p.sub { color: var(--muted); margin: 0 0 20px; }
+  #log { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; min-height:280px; max-height:60vh; overflow:auto; }
+  .msg { margin: 0 0 14px; white-space: pre-wrap; } .q { font-weight:600; } .a { color: var(--text); }
+  .src { font-size: 12px; color: var(--muted); margin-top: -8px; margin-bottom: 14px; }
+  form { display:flex; gap:8px; margin-top:12px; } input { flex:1; padding:12px 14px; border-radius:10px; border:1px solid var(--border); background:var(--card); color:var(--text); font:inherit; }
+  button { padding:12px 18px; border:0; border-radius:10px; background:var(--primary); color:#fff; font:600 15px system-ui; cursor:pointer; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; } .chips button { background:transparent; color:var(--text); border:1px solid var(--border); font-weight:500; padding:6px 12px; font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ask about Sahul</h1>
+  <p class="sub">A Node.js + Express RAG demo. Questions hit <code>POST /api/ask</code>, which retrieves facts with BM25 and (optionally) asks an LLM to answer from them.</p>
+  <div id="log" aria-live="polite"></div>
+  <form id="f"><input id="q" placeholder="e.g. What is his notice period?" maxlength="500" autocomplete="off" /><button>Ask</button></form>
+  <div class="chips">
+    <button data-q="Does he know Node.js?">Node.js?</button><button data-q="What AI / LLM work has he done?">AI work?</button>
+    <button data-q="What is his notice period?">Notice period?</button><button data-q="Is he open to remote work?">Remote?</button>
+    <button data-q="How can I contact him?">Contact</button>
+  </div>
+</main>
+<script>
+  const log = document.getElementById('log'), q = document.getElementById('q');
+  const add = (cls, text) => { const p = document.createElement('p'); p.className = 'msg ' + cls; p.textContent = text; log.appendChild(p); log.scrollTop = log.scrollHeight; return p; };
+  async function ask(question) {
+    add('q', question); const a = add('a', 'Thinking…');
+    try {
+      const r = await fetch('/api/ask', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ question }) });
+      const d = await r.json();
+      a.textContent = d.answer || d.error;
+      if (d.sources) add('src', `mode: ${d.mode} · sources: ${d.sources.map(s => s.title).join(', ') || 'none'}`);
+    } catch (e) { a.textContent = 'Could not reach the API.'; }
+  }
+  document.getElementById('f').onsubmit = e => { e.preventDefault(); if (q.value.trim()) { ask(q.value.trim()); q.value = ''; } };
+  document.querySelectorAll('[data-q]').forEach(b => b.onclick = () => ask(b.dataset.q));
+</script>
+</body>
+</html>
